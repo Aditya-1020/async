@@ -1,0 +1,9 @@
+.vscode/
+boolector/
+dump/
+sby/
+.venv/
+yosys/
+*.log
+*.vcd
+*.sby
