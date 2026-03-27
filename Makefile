@@ -1,5 +1,5 @@
-SBY_FILE   ?= async_fifo.sby
-SIM        ?= icarus
+SBY_FILE   ?= async_fifo_2ff.sby
+SIM ?= verilator
 TOP_LEVEL_LANG ?= verilog
 SIM_ARGS   ?= --trace
 VERILOG_SOURCES ?= src/fifo_mem.v src/sync_fifo/sync_fifo.v
@@ -16,7 +16,6 @@ venv:
 	python3 -m venv .venv
 	$(ACTIVATE_VENV) && pip install --upgrade pip && pip install cocotb
 
-# SymbiYosys must be installed system-wide: sudo apt install yosys symbiyosys
 formal:
 	sby -f formal/$(SBY_FILE)
 
@@ -35,3 +34,4 @@ sim:
 clean:
 	rm -rf sim_build __pycache__ results.xml *.vcd
 	rm -rf tb/__pycache__
+	rm -rf formal/async_fifo_2ff

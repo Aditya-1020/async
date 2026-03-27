@@ -6,4 +6,3 @@ sby/
 yosys/
 *.log
 *.vcd
-*.sby
