@@ -148,6 +148,19 @@ module async_fifo_2ff #(
             end
         end
 
+        // cover
+        always @(posedge wr_clk) begin
+            if (wr_en && !full) begin
+                cover(wr_ptr_b == DEPTH-1);
+            end
+        end
+
+        always @(posedge rd_clk) begin
+            if (rd_en && !empty) begin
+                cover(rd_ptr_b == DEPTH-1);
+            end
+        end
+
     `endif
 
 endmodule

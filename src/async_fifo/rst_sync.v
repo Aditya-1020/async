@@ -17,4 +17,16 @@ module rst_sync #(
 
     assign sync_rst_n_out = sync_reg[NUM_STAGES-1];
 
+    `ifdef FORMAL
+        initial assume(!rst_n);
+
+        always @(posedge clk_dst) begin
+            if (!rst_n) begin
+                assert(sync_reg == 0);
+                assert(sync_rst_n_out == 0);
+            end
+        end
+
+    `endif
+
 endmodule

@@ -1,4 +1,4 @@
-SBY_FILE   ?= async_fifo_2ff.sby
+SBY_FILE ?= async_fifo_2ff.sby
 SIM ?= verilator
 TOP_LEVEL_LANG ?= verilog
 SIM_ARGS   ?= --trace
@@ -34,4 +34,4 @@ sim:
 clean:
 	rm -rf sim_build __pycache__ results.xml *.vcd
 	rm -rf tb/__pycache__
-	rm -rf formal/async_fifo_2ff
+	rm -rf formal/async_fifo_2ff formal/rst_sync

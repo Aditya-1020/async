@@ -49,4 +49,7 @@ module sync_fifo #(
     assign overflow = wr_en && full;
     assign underflow = rd_en && empty;
 
+    `
+
+
 endmodule

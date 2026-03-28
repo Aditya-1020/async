@@ -1,0 +1,13 @@
+[options]
+mode prove
+depth 15
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal rst_sync.v
+prep -top rst_sync
+
+[files]
+src/async_fifo/rst_sync.v
