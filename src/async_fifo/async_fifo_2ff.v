@@ -70,7 +70,7 @@ module async_fifo_2ff #(
     // write pointer
     always @(posedge wr_clk or negedge wr_rst_n_sync) begin
         if (!wr_rst_n_sync) begin
-            wr_ptr_b <= 0;
+            wr_ptr_b <= {PTR_WIDTH{1'b0}};
         end else if (wr_en && !full) begin
             wr_ptr_b <= wr_ptr_b + 1'b1;
         end
@@ -79,7 +79,7 @@ module async_fifo_2ff #(
     // read pointer
     always @(posedge rd_clk or negedge rd_rst_n_sync) begin
         if (!rd_rst_n_sync) begin
-            rd_ptr_b <= 0;
+            rd_ptr_b <= {PTR_WIDTH{1'b0}};
         end else if (rd_en && !empty) begin
             rd_ptr_b <= rd_ptr_b + 1'b1;
         end

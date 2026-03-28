@@ -21,7 +21,7 @@ module sync_fifo #(
     // write
     always @(posedge clk) begin
         if (!rst_n) begin
-            wr_ptr <= 0;
+            wr_ptr <= {PTR_WIDTH{1'b0}};
         end else if (wr_en && !full) begin
             wr_ptr <= wr_ptr + 1'b1;
         end
@@ -29,7 +29,7 @@ module sync_fifo #(
 
     always @(posedge clk) begin
         if (!rst_n) begin
-            rd_ptr <= 0;
+            rd_ptr <= {PTR_WIDTH{1'b0}};
         end else if (rd_en && !empty) begin
             rd_ptr <= rd_ptr + 1'b1;
         end
@@ -48,8 +48,5 @@ module sync_fifo #(
     assign empty = (wr_ptr == rd_ptr);
     assign overflow = wr_en && full;
     assign underflow = rd_en && empty;
-
-    `
-
 
 endmodule

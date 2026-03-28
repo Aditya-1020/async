@@ -1,0 +1,15 @@
+[options]
+mode prove
+depth 15
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal sync_fifo.v
+read -formal fifo_mem.v
+prep -top sync_fifo
+
+[files]
+src/sync_fifo/sync_fifo.v
+src/fifo_mem.v
