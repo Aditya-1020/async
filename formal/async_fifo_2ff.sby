@@ -1,0 +1,20 @@
+[options]
+mode prove
+depth 15
+multiclock on
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal async_fifo_2ff.v
+read -formal sync_2ff.v
+read -formal fifo_mem.v
+read -formal rst_sync.v
+prep -top async_fifo_2ff
+
+[files]
+src/async_fifo/async_fifo_2ff.v
+src/async_fifo/sync_2ff.v
+src/async_fifo/rst_sync.v
+src/fifo_mem.v
