@@ -6,3 +6,4 @@ sby/
 yosys/
 *.log
 *.vcd
+TODO.md
