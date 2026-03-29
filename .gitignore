@@ -8,3 +8,4 @@ yosys/
 *.vcd
 TODO.md
 openlane2/
+runs/
