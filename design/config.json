@@ -1,0 +1,28 @@
+{
+    "DESIGN_NAME": "async_fifo",
+    "VERILOG_FILES": [
+        "dir::src/async_fifo.v",
+        "dir::src/async_fifo_2ff.v",
+        "dir::src/sync_2ff.v"
+    ],
+
+    "CLOCK_PORT": "wr_clk",
+    "CLOCK_PERIOD": 10.0,
+
+    "pdk::sky130A": {
+        "MAX_FANOUT_CONSTRAINT": 6,
+        "FP_CORE_UTIL": 40,
+        "PL_TARGET_DENSITY_PCT": "expr::($FP_CORE_UTIL + 10.0)",
+
+        "scl::sky130_fd_sc_hd": {
+            "CLOCK_PERIOD": 10.0
+        }
+    },
+
+    "DIE_AREA": {
+        "WIDTH": 100,
+        "HEIGHT": 100
+    },
+    "BASE_SDC_FILE": "dir::design/custom_constraints.sdc",
+    
+}

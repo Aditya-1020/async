@@ -5,8 +5,8 @@ SIM_ARGS   ?= --trace
 VERILOG_SOURCES ?= src/fifo_mem.v src/sync_fifo/sync_fifo.v
 TOPLEVEL   ?= sync_fifo
 COCOTB_TEST_MODULES ?= tb.tb_sync_fifo
-
 ACTIVATE_VENV := . .venv/bin/activate
+NIX_SHELL = nix-shell --pure ~/openlane2/shell.nix
 
 .PHONY: all clean formal lint sim venv
 
@@ -21,6 +21,9 @@ formal:
 
 lint:
 	verilator --lint-only -Wall src/*.v
+
+nix-shell:
+	$(NIX_SHELL)
 
 sim:
 	$(ACTIVATE_VENV) && \

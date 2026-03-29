@@ -7,3 +7,4 @@ yosys/
 *.log
 *.vcd
 TODO.md
+openlane2/
