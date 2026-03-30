@@ -68,14 +68,6 @@ module async_fifo_2ff #(
     );
     
     // write pointer
-    // always @(posedge wr_clk) begin
-    //     if (!wr_rst_n_sync) begin
-    //         wr_ptr_b <= {PTR_WIDTH{1'b0}};
-    //     end else if (wr_en && !full) begin
-    //         wr_ptr_b <= wr_ptr_b + 1'b1;
-    //     end
-    // end
-
     ptr_inc #(.PTR_WIDTH(PTR_WIDTH)) wr_ptr_inc (
         .i_clk(wr_clk),
         .i_rst_n(wr_rst_n_sync),
@@ -83,16 +75,8 @@ module async_fifo_2ff #(
         .i_flag(full),
         .o_ptr(wr_ptr_b)
     );
-
+    
     // read pointer
-    // always @(posedge rd_clk) begin
-    //     if (!rd_rst_n_sync) begin
-    //         rd_ptr_b <= {PTR_WIDTH{1'b0}};
-    //     end else if (rd_en && !empty) begin
-    //         rd_ptr_b <= rd_ptr_b + 1'b1;
-    //     end
-    // end
-
     ptr_inc #(.PTR_WIDTH(PTR_WIDTH)) rd_ptr_inc (
         .i_clk(rd_clk),
         .i_rst_n(rd_rst_n_sync),
