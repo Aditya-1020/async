@@ -8,7 +8,7 @@ module sync_2ff #(
 );
     reg [WIDTH-1:0] sync_reg;
 
-    always @(posedge clk_dst or negedge rst_n) begin
+    always @(posedge clk_dst) begin
         if (!rst_n) begin
             sync_reg <= 0;
             sync_dout <= 0;

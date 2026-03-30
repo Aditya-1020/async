@@ -19,13 +19,13 @@ module async_fifo_2ff #(
     output wire underflow
 );
     localparam integer PTR_WIDTH = ADDR_WIDTH + 1; // extra bit for full/empty distinction
-    localparam integer DEPTH = 1 << ADDR_WIDTH;
+    // localparam integer DEPTH = 1 << ADDR_WIDTH;
     localparam integer RST_NUM_STAGES = 2;
 
     wire wr_rst_n_sync, rd_rst_n_sync;
-    reg [PTR_WIDTH-1:0] wr_ptr_b, rd_ptr_b; // binary
+    wire [PTR_WIDTH-1:0] wr_ptr_b, rd_ptr_b; // binary
     wire [PTR_WIDTH-1:0] wr_ptr_g, rd_ptr_g;  // gray
-    reg [PTR_WIDTH-1:0] wr_ptr_g_sync, rd_ptr_g_sync; // synchronized gry pointers
+    wire [PTR_WIDTH-1:0] wr_ptr_g_sync, rd_ptr_g_sync; // synchronized gry pointers
     
     assign wr_ptr_g = (wr_ptr_b >> 1) ^ wr_ptr_b;
     assign rd_ptr_g = (rd_ptr_b >> 1) ^ rd_ptr_b;
@@ -68,22 +68,38 @@ module async_fifo_2ff #(
     );
     
     // write pointer
-    always @(posedge wr_clk or negedge wr_rst_n_sync) begin
-        if (!wr_rst_n_sync) begin
-            wr_ptr_b <= {PTR_WIDTH{1'b0}};
-        end else if (wr_en && !full) begin
-            wr_ptr_b <= wr_ptr_b + 1'b1;
-        end
-    end
+    // always @(posedge wr_clk) begin
+    //     if (!wr_rst_n_sync) begin
+    //         wr_ptr_b <= {PTR_WIDTH{1'b0}};
+    //     end else if (wr_en && !full) begin
+    //         wr_ptr_b <= wr_ptr_b + 1'b1;
+    //     end
+    // end
+
+    ptr_inc #(.PTR_WIDTH(PTR_WIDTH)) wr_ptr_inc (
+        .i_clk(wr_clk),
+        .i_rst_n(wr_rst_n_sync),
+        .i_en(wr_en),
+        .i_flag(full),
+        .o_ptr(wr_ptr_b)
+    );
 
     // read pointer
-    always @(posedge rd_clk or negedge rd_rst_n_sync) begin
-        if (!rd_rst_n_sync) begin
-            rd_ptr_b <= {PTR_WIDTH{1'b0}};
-        end else if (rd_en && !empty) begin
-            rd_ptr_b <= rd_ptr_b + 1'b1;
-        end
-    end
+    // always @(posedge rd_clk) begin
+    //     if (!rd_rst_n_sync) begin
+    //         rd_ptr_b <= {PTR_WIDTH{1'b0}};
+    //     end else if (rd_en && !empty) begin
+    //         rd_ptr_b <= rd_ptr_b + 1'b1;
+    //     end
+    // end
+
+    ptr_inc #(.PTR_WIDTH(PTR_WIDTH)) rd_ptr_inc (
+        .i_clk(rd_clk),
+        .i_rst_n(rd_rst_n_sync),
+        .i_en(rd_en),
+        .i_flag(empty),
+        .o_ptr(rd_ptr_b)
+    );
 
     assign full = (wr_ptr_g == {~rd_ptr_g_sync[PTR_WIDTH-1:PTR_WIDTH-2], rd_ptr_g_sync[PTR_WIDTH-3:0]});
     assign empty = (wr_ptr_g_sync == rd_ptr_g);
@@ -151,13 +167,13 @@ module async_fifo_2ff #(
         // cover
         always @(posedge wr_clk) begin
             if (wr_en && !full) begin
-                cover(wr_ptr_b == DEPTH-1);
+                cover(wr_ptr_b == (1<<ADDR_WIDTH)-1);
             end
         end
 
         always @(posedge rd_clk) begin
             if (rd_en && !empty) begin
-                cover(rd_ptr_b == DEPTH-1);
+                cover(rd_ptr_b == (1<<ADDR_WIDTH)-1);
             end
         end
 
