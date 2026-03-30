@@ -3,6 +3,7 @@
     
     "VERILOG_FILES": [
         "dir::src/async_fifo/async_fifo_2ff.v",
+        "dir::src/async_fifo/ptr_inc.v",
         "dir::src/async_fifo/sync_2ff.v",
         "dir::src/async_fifo/rst_sync.v",
         "dir::src/fifo_mem.v"
@@ -24,6 +25,7 @@
             "CLOCK_PERIOD": 10.0
         }
     },
+    "RUN_KLAYOUT_XOR": 0,
 
     "DIE_AREA": "0 0 100 100"    
 }

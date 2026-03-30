@@ -9,3 +9,7 @@ yosys/
 TODO.md
 openlane2/
 runs/
+.Xil/
+*.jou
+*.log
+project_async_fifo/

@@ -38,3 +38,4 @@ clean:
 	rm -rf sim_build __pycache__ results.xml *.vcd
 	rm -rf tb/__pycache__
 	rm -rf formal/async_fifo_2ff formal/rst_sync formal/sync_fifo
+	rm -rf *.jou *.log
