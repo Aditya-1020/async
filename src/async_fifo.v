@@ -93,13 +93,11 @@ module async_fifo (
     );
 
     // sram read address pre-fetching
-    reg [ADDR_WIDTH-1:0] rd_addr_r;
+    // reg [ADDR_WIDTH-1:0] rd_addr_r;
 
     always @(posedge rd_clk) begin
         if (!rd_rst_n_sync) begin
             rd_addr_r <= {ADDR_WIDTH{1'b0}};
-        end else if (rd_en && !empty) begin // data is ready one cycle laeter
-            rd_addr_r <= rd_ptr_b[ADDR_WIDTH-1:0] + 1'b1;
         end else begin
             rd_addr_r <= rd_addr_r;
         end
@@ -117,7 +115,7 @@ module async_fifo (
         // read port
         .rd_clk(rd_clk),
         .rd_en(!empty), // active whenever data exists
-        .rd_addr(rd_addr_r),
+        .rd_addr(rd_ptr_b[ADDR_WIDTH-1:0]),
         .rd_data(rd_data)
     );
     
