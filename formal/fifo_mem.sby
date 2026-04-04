@@ -1,0 +1,13 @@
+[options]
+mode prove
+depth 1
+
+[engines]
+smtbmc boolector
+
+[script]
+read -formal fifo_mem_fv_tst.v
+prep -top fifo_mem_fv_tst
+
+[files]
+src/fifo_mem_fv_tst.v

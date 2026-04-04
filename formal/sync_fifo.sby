@@ -11,5 +11,5 @@ read -formal fifo_mem.v
 prep -top sync_fifo
 
 [files]
-src/sync_fifo/sync_fifo.v
+src/sync_fifo.v
 src/fifo_mem.v

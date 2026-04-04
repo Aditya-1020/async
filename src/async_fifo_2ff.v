@@ -1,4 +1,4 @@
-module async_fifo_2ff (
+module async_fifo (
     // write side
     input wire wr_clk,
     input wire wr_rst_n,
@@ -19,6 +19,24 @@ module async_fifo_2ff (
     localparam integer ADDR_WIDTH = 6; // 64 entries
     localparam integer PTR_WIDTH = ADDR_WIDTH + 1; // extra bit for full/empty distinction
     localparam integer RST_NUM_STAGES = 2;
+
+    generate
+        if (DATA_WIDTH != 16) begin : g_dw
+            initial $fatal(1, "DATA_WIDTH must be 16");
+        end
+
+        if (ADDR_WIDTH != 6) begin : g_aw
+            initial $fatal(1, "ADDR_WIDTH must be 6");
+        end
+
+        if (PTR_WIDTH != ADDR_WIDTH + 1) begin : g_pw
+            initial $fatal(1, "PTR_WIDTH must be ADDR_WIDTH+1");
+        end
+
+        if (RST_NUM_STAGES != 2) begin : g_rst
+            initial $fatal(1, "RST_NUM_STAGES must be 2");
+        end
+    endgenerate
 
     // internal signals
     wire wr_rst_n_sync, rd_rst_n_sync;

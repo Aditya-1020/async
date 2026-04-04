@@ -1,7 +1,7 @@
-SBY_FILE ?= async_fifo_2ff.sby
+SBY_FILE ?= fifo_mem.sby
 SIM       ?= verilator
 TOP_LEVEL_LANG ?= verilog
-VERILOG_SOURCES ?= src/fifo_mem.v src/fifo_sram_16x64_pdp.v
+VERILOG_SOURCES ?= src/fifo_mem_fv_tst.v 
 TOPLEVEL  ?= fifo_mem
 COCOTB_TEST_MODULES ?= tb.fifo_mem
 ACTIVATE_VENV := . .venv/bin/activate
@@ -39,5 +39,5 @@ clean:
 	rm -rf __pycache__ results.xml *.vcd
 	rm -rf tb/__pycache__
 	rm -rf sim_build
-	rm -rf formal/async_fifo_2ff formal/rst_sync formal/sync_fifo
+	rm -rf formal/async_fifo formal/rst_sync formal/sync_fifo formal/fifo_mem
 	rm -rf *.jou *.log
