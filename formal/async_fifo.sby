@@ -11,6 +11,8 @@ read -formal async_fifo.v
 read -formal sync_2ff.v
 read -formal fifo_mem.v
 read -formal rst_sync.v
+read -formal ptr_inc.v
+read_verilog -sv fifo_sram_stub.v
 prep -top async_fifo
 
 [files]
@@ -18,3 +20,5 @@ src/async_fifo.v
 src/sync_2ff.v
 src/rst_sync.v
 src/fifo_mem.v
+src/ptr_inc.v
+src/fifo_sram_stub.v

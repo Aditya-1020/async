@@ -51,7 +51,9 @@ module fifo_sram_16x64_pdp(
     web0_reg = web0;
     addr0_reg = addr0;
     din0_reg = din0;
+    /* verilator lint_off STMTDLY */
     #(T_HOLD) dout0 = 16'bx;
+    /* verilator lint_on STMTDLY */
     if ( !csb0_reg && web0_reg && VERBOSE )
       $display($time," Reading %m addr0=%b dout0=%b",addr0_reg,mem[addr0_reg]);
     if ( !csb0_reg && !web0_reg && VERBOSE )
@@ -69,7 +71,9 @@ module fifo_sram_16x64_pdp(
     addr1_reg = addr1;
     if (!csb0 && !web0 && !csb1 && (addr0 == addr1))
          $display($time," WARNING: Writing and reading addr0=%b and addr1=%b simultaneously!",addr0,addr1);
+    /* verilator lint_off STMTDLY */
     #(T_HOLD) dout1 = 16'bx;
+    /* verilator lint_on STMTDLY */
     if ( !csb1_reg && VERBOSE ) 
       $display($time," Reading %m addr1=%b dout1=%b",addr1_reg,mem[addr1_reg]);
   end

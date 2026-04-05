@@ -1,9 +1,9 @@
+# Sram validation
 import cocotb
 from cocotb.triggers import RisingEdge, FallingEdge, Timer
 from cocotb.clock import Clock
 import random
 
-# Match fifo_mem parameters exactly
 DATA_WIDTH = 16
 ADDR_WIDTH = 6
 FIFO_DEPTH = 2 ** ADDR_WIDTH  # 64 entries
@@ -28,7 +28,7 @@ async def write_word(dut, addr, data):
     await RisingEdge(dut.wr_clk)
     dut.wr_en.value = 0
     await FallingEdge(dut.wr_clk)
-    await Timer(1, unit="ns")
+    await Timer(SRAM_READ_DELAY_NS, unit="ns")
 
 
 async def read_word(dut, addr):
@@ -106,14 +106,14 @@ async def test_write_enable_gate(dut):
     log = dut._log
     cocotb.start_soon(Clock(dut.wr_clk, 10, unit="ns").start())
     cocotb.start_soon(Clock(dut.rd_clk, 13, unit="ns").start())
-    
     await reset_dut(dut)
     await write_word(dut, 0, 0xABCD)
-
     dut.wr_en.value   = 0
     dut.wr_addr.value = 0
     dut.wr_data.value = 0xFFFF
     await RisingEdge(dut.wr_clk)
+    await FallingEdge(dut.wr_clk)
+    await Timer(SRAM_READ_DELAY_NS, unit="ns")
     readback = await read_word(dut, 0)
     assert readback == 0xABCD, (f"FAIL wr_en gate: memory changed to {readback:#06x} without wr_en")
     log.info("test_write_enable_gate: PASS")
@@ -132,7 +132,7 @@ async def test_read_enable_gate(dut):
     dut.rd_addr.value = 1
     dut.rd_en.value   = 0
     await RisingEdge(dut.rd_clk)
-    await Timer(1, unit="ns")
+    await Timer(SRAM_READ_DELAY_NS, unit="ns")
 
     log.info(f"test_read_enable_gate: rd_data with rd_en=0 => {dut.rd_data.value}")
     log.info("test_read_enable_gate: PASS (no crash, csb1 was high)")
