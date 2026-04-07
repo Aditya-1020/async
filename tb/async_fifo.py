@@ -53,3 +53,17 @@ async def simple_write_read_test(dut):
     
     read_data = await read_word(dut)
     assert read_data == data, f"Read {hex(read_data)} != written {hex(data)}"
+
+
+@cocotb.test()
+async def test_reset_state(dut):
+    """After reset: empty=1, full=0, overflow=0, underflow=0"""
+    dut._log.info("Reset state")
+    cocotb.start_soon(Clock(dut.wr_clk, 10, unit="ns").start())
+    cocotb.start_soon(Clock(dut.rd_clk, 15, unit="ns").start())
+    await reset_dut(dut)
+    assert dut.empty.value == 1, "FIFO should be empty after reset"
+    assert dut.full.value == 0, "FIFO should not be full after reset"
+    assert dut.overflow.value == 0, "FIFO should not overflow asserted after reset"
+    assert dut.underflow.value == 0, "FIFO should not underflow asserted after reset"
+    dut._log.info("Reset state verified")
