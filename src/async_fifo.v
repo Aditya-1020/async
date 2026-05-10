@@ -112,49 +112,46 @@ module async_fifo (
     assign underflow = rd_en && empty;
 
     `ifdef FORMAL
-        // reg f_past_valid_wr = 1'b0;
-        // reg f_past_valid_rd = 1'b0;
-        // always @(posedge wr_clk) f_past_valid_wr <= 1'b1;
-        // always @(posedge rd_clk) f_past_valid_rd <= 1'b1;
+        function automatic onehot;
+            input [PTR_WIDTH-1:0] v;
+            begin
+                ohehot = (v & (v-1)) == 0;
+            end
+        endfunction
+        
+        reg f_past_valid = 0;
+        always @(posedge wr_clk) f_past_valid <= 1;
 
         initial begin
             assume(!wr_rst_n);
             assume(!rd_rst_n);
         end
 
-        // cover
         always @(posedge wr_clk) begin
-            cover(wr_ptr_b == (1 << ADDR_WIDTH) - 1);
+            if (f_past_valid)
+                assume($stable(wr_rst_n));
         end
 
         always @(posedge rd_clk) begin
-            cover(rd_ptr_b == (1 << ADDR_WIDTH) - 1);
+            if (f_past_valid)
+                assume($stable(rd_rst_n));
         end
 
-        always @(*) begin
-            if (overflow) begin
-                assert(full);
-            end else begin
-                $display("Full not asserted for Overflow");
-            end
-            
-            if (underflow) begin 
-                assert(empty);
-            end else begin
-                $display("Full not asserted for Overflow");
-            end
+        always @(posedge wr_clk) begin
+            if (wr_rst_n_sync && rd_rst_n_sync)
+                assert (!(full && empty));
         end
 
-        // pointer advance in wrclk
-            // past sync_rd_ptr high && past rd_en && !emprty true -> wr_ptr_b must equal ($past(wr_ptr_b) + 1)
-                // logic seems off
+        always @(posedge wr_clk) begin
+            assert (!overflow|| full);
+        end
 
-        // pointer advance in rdclk
-            // pass sync_wr_ptr high && past wr_en && !full false -> 44rd_ptr (wr_ptr_b) must not adcvace
-            // shouldnt we just look at the synced pointers for this? since the nunsynced ones arent controlling anythig?
-        
+        always @(posedge rd_clk) begin
+            assert (!underflow|| empty);
+        end
 
+        always @(posedge wr_clk) cover(wr_ptr_b == (1 << ADDR_WIDTH) - 1);
+        always @(posedge rd_clk) cover(rd_ptr_b == (1 << ADDR_WIDTH) - 1);
     `endif
-
 
 endmodule

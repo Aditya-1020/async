@@ -34,9 +34,11 @@ async def read_word(dut):
     dut.rd_en.value = 1
     await RisingEdge(dut.rd_clk)
     await FallingEdge(dut.rd_clk)
-    await Timer(1, unit="ns")
+    await Timer(4, unit="ns")
     dut.rd_en.value = 0
-    return dut.rd_data.value.to_unsigned()
+    val =  dut.rd_data.value.to_unsigned()
+    dut.rd_en.value = 0
+    return val
 
 async def start_clk(dut, wr_clk_period, rd_clk_period, wr_unit, rd_unit):
     cocotb.start_soon(Clock(dut.wr_clk, wr_clk_period, unit=wr_unit).start())
@@ -96,33 +98,121 @@ async def test_empty_condition(dut):
     assert read_data == 0, f"read data should be 0 when underflow, got {hex(read_data)}"
     dut._log.info("Empty condition verified")
 
-# @cocotb.test()
-# async def test_fill_and_drain(dut):
-#     """Write 64 words sequentially, drain all 64, verify each word in order"""
-#     pass
+@cocotb.test()
+async def test_fill_and_drain(dut):
+    """write 64 words sequentially, drain all 64, verify each word in order"""
+    dut._log.info("fill and drain")
+    await start_clk(dut, 10, 15,  "ns", "ns")
+    await reset_dut(dut)
+
+    written = list(range(FIFO_DEPTH))
+    for data in written:
+        await write_word(dut, data)
+    
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    
+    for expected in written:
+        read_data = await read_word(dut)
+        assert read_data == expected, f"read data should be {hex(expected)}, got {hex(read_data)}"
+    
+    dut._log.info("Fill and drain verified")
+
+@cocotb.test()
+async def test_pointer_wraparound(dut):
+    dut._log.info("pointer wrap around")
+    await start_clk(dut, 10, 15, "ns", "ns")
+    await reset_dut(dut)
+    
+    for i in range(FIFO_DEPTH):
+        await write_word(dut, i)
+    
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    
+    for expected in range(FIFO_DEPTH):
+        read_data = await read_word(dut)
+        assert read_data == expected, f"drain(1) read data should be {hex(expected)}, got {hex(read_data)}"
+    
+    assert dut.empty.value == 1, "fifo should be empty after full drain"
+
+    for i in range(FIFO_DEPTH):
+        await write_word(dut, i+FIFO_DEPTH)
+    
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    
+    for expected in range(FIFO_DEPTH, FIFO_DEPTH*2):
+        read_data = await read_word(dut)
+        assert read_data == expected, f"drain(2) read data should be {hex(expected)}, got {hex(read_data)}"
+    
+    dut._log.info("Pointer wraparound verified")
  
-# @cocotb.test()
-# async def test_pointer_wraparound(dut):
-#     """Fill, drain, fill again — forces wr_ptr and rd_ptr to wrap past 0"""
-#     pass
+@cocotb.test()
+async def test_concurrent_rw(dut):
+    await start_clk(dut, 10, 15, "ns", "ns")
+    await reset_dut(dut)
+
+    prefill = list(range(FIFO_DEPTH//2))
+    for data in prefill:
+        await write_word(dut, data)
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    
+    # for each new write do one read
+    import collections
+    refer = collections.deque(prefill)
+    for i in range(FIFO_DEPTH//2):
+        new_data = i * FIFO_DEPTH
+        refer.append(new_data)
+        await write_word(dut, new_data)
+        for _ in range(4):
+            await RisingEdge(dut.rd_clk)
+        read_data = await read_word(dut)
+        expected = refer.popleft()
+        assert read_data == expected, f"read data should be {hex(expected)}, got {hex(read_data)}"
+
+    dut._log.info("Concurrent read/write verified")
+
+@cocotb.test()
+async def test_clock_ratio_fast_write(dut):
+    await start_clk(dut, 10, 40, "ns", "ns")
+    await reset_dut(dut)
+
+    written = list(range(FIFO_DEPTH))
+    for data in written:
+        await write_word(dut, data)
+    
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    
+    assert dut.empty.value == 0, "fifo should not be empty after writign"
+
+    for expected in written:
+        read_data = await read_word(dut)
+        assert read_data == expected, f"fast_write {hex(expected)}, got {hex(read_data)}"
+
+    dut._log.info("Clock ratio fast write verified")
  
-# @cocotb.test()
-# async def test_concurrent_rw(dut):
-#     """Pre-fill half, then write and read simultaneously, verify no data loss"""
-#     pass
- 
-# @cocotb.test()
-# async def test_asymmetric_reset(dut):
-#     """Assert only wr_rst_n, verify write side resets but read side holds state"""
-#     """Assert only rd_rst_n, verify read side resets but write side holds state"""
-#     pass
- 
-# @cocotb.test()
-# async def test_clock_ratio_fast_write(dut):
-#     """wr_clk 4x faster than rd_clk — stress synchronizer latency"""
-#     pass
- 
-# @cocotb.test()
-# async def test_clock_ratio_fast_read(dut):
-#     """rd_clk 4x faster than wr_clk — verify empty propagates correctly"""
-#     pass
+@cocotb.test()
+async def test_clock_ratio_fast_read(dut):
+    dut._log.info("clock ratio fast read")
+    await start_clk(dut, 40, 10, "ns", "ns")
+    await reset_dut(dut)
+    
+    written = list(range(FIFO_DEPTH))
+    for data in written:
+        await write_word(dut, data)
+
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    
+    for exp in written:
+        read_data = await read_word(dut)
+        assert read_data == exp, f"fast read {hex(exp)}, got{hex(read_data)}"
+
+    for _ in range(6):
+        await RisingEdge(dut.rd_clk)
+    assert dut.empty.value == 1, "empty should assert after fulld drain"
+
+    dut._log.info("clock ratio fast read verified")

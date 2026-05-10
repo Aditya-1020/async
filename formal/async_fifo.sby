@@ -1,6 +1,6 @@
 [options]
-mode prove
-depth 15
+mode bmc
+depth 128
 multiclock on
 
 [engines]

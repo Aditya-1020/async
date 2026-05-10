@@ -14,4 +14,10 @@ module ptr_inc #(
         end
     end
 
+    `ifdef FORMAL
+        initial begin
+            assume(o_ptr == 0);
+        end
+    `endif
+
 endmodule

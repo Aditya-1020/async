@@ -46,4 +46,4 @@ clean:
 	rm -rf tb/__pycache__
 	rm -rf sim_build
 	rm -rf formal/async_fifo formal/rst_sync formal/sync_fifo formal/fifo_mem
-	rm -rf *.jou *.log *.vcd *.fst
+	rm -rf *.jou *.log *.vcd *.fst .Xil

@@ -18,4 +18,11 @@ module sync_2ff #(
         end
     end
 
+    `ifdef FORMAL
+        initial begin
+            assume(sync_reg == 0);
+            assume(sync_dout == 0);
+        end
+    `endif 
+
 endmodule
